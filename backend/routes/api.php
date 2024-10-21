@@ -15,7 +15,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('list', [ListController::class, 'index']);
     Route::get('list/{id}', [ListController::class, 'show']);
     Route::post('list-edit/{id}', [ListController::class, 'update']);
-    Route::get('list-delete/{id}', [ListController::class, 'archive']);
+    Route::get('list-archive/{id}', [ListController::class, 'archive']);
+    Route::get('list-delete/{id}', [ListController::class, 'destroy']);
 });
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
