@@ -4,8 +4,8 @@ import { NavLink } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  OrderedListOutlined,
   ShoppingCartOutlined,
+  LogoutOutlined
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
 const { Header, Sider, Content, Footer } = Layout;
@@ -14,6 +14,11 @@ const App = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  
+  const LogoutHandle = () => {
+    localStorage.removeItem("token");
+    window.location.reload()
+}
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -30,8 +35,8 @@ const App = () => {
             },
             {
               key: '2',
-              icon: <NavLink to="/list"><OrderedListOutlined /></NavLink>,
-              label: 'Liste Oluştur',
+              icon: <LogoutOutlined onClick={LogoutHandle} />,
+              label: <a onClick={LogoutHandle}>Çıkış Yap</a>,
             },
           ]}
         />
