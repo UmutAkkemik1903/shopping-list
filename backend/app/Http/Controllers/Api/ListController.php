@@ -17,40 +17,52 @@ class ListController extends Controller
      */
     public function index()
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            
-            $products = ListModel::where(['deleted_at'=>null])->where('created_by', $user->id)
-                ->get([
-                    'id as list_id',
-                    'name as list_name',
-                    'created_at as list_created_at',
-                ]);
-        
-            return response()->json($products);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);
-        }
-        
+      //   
     }
 
     public function archivedList()
     {
         if (Auth::check()) {
             $user = Auth::user();
-            
-            $products = ListModel::whereNotNull('deleted_at')->where('created_by', $user->id)
+            $products = ListModel::leftJoin('list_product', function($join) {
+                    $join->on('list_product.list_id', '=', 'shopping_list.id');
+                })
+                ->leftJoin('products', function($join) {
+                    $join->on('list_product.product_id', '=', 'products.id');
+                })
+                ->whereNotNull('shopping_list.deleted_at')
+                ->where('shopping_list.created_by', $user->id)
                 ->get([
-                    'id as list_id',
-                    'name as list_name',
-                    'created_at as list_created_at',
+                    'shopping_list.id as list_id',
+                    'shopping_list.name as list_name',
+                    'shopping_list.created_at as list_created_at',
+                    'products.id as product_id',
+                    'products.name as product_name',
+                    'list_product.created_at as product_created_at',
+                    'list_product.quantity as quantity'
                 ]);
         
-            return response()->json($products);
+            $groupedProducts = $products->groupBy('list_id')->map(function($items) {
+                return [
+                    'list_id' => $items->first()->list_id,
+                    'list_name' => $items->first()->list_name,
+                    'created_at' => $items->first()->list_created_at,
+                    'products' => $items->map(function($item) {
+                        return [
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product_name,
+                            'product_created_at' => $item->product_created_at,
+                            'quantity' => $item->quantity,
+                        ];
+                    }),
+                ];
+            })->values();
+        
+            return response()->json($groupedProducts);
         } else {
             return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);
-        }
-        
+        } 
+  
     }
 
     /**
@@ -155,6 +167,7 @@ class ListController extends Controller
         $user = Auth::user();
         if ($user) {
             ListModel::where(['id'=>$id])->delete();
+            ListProductModel::where(['list_id'=>$id])->delete();
             return response()->json(['success' => true, 'message' => 'Silme işlemi başarılı.']);
         } else {
             return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);

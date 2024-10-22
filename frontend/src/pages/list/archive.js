@@ -25,6 +25,23 @@ const ArchivedList = () => {
     if (loading) return <Spin />;
     if (error) return <Alert message={`Error: ${error}`} type="error" />;
 
+    const expandColumns = [
+        {
+            title: 'Eklenme Tarihi',
+            dataIndex: 'product_created_at',
+            key: 'product_created_at',
+        },
+        {
+            title: 'Ürün Adı',
+            dataIndex: 'product_name',
+            key: 'product_name',
+        },
+        {
+            title: 'Miktar',
+            dataIndex: 'quantity',
+            key: 'quantity',
+        },
+    ];
     const columns = [
         {
             title: 'Liste Adı',
@@ -45,6 +62,14 @@ const ArchivedList = () => {
             </Popconfirm>,
         },
     ];
+    const expandedRowRender = (record) => (
+        <Table
+            columns={expandColumns}
+            dataSource={record.products}
+            pagination={false}
+            rowKey="product_id"
+        />
+    );
 
     return (
         <>
@@ -52,6 +77,10 @@ const ArchivedList = () => {
         bordered
         columns={columns}
         dataSource={lists}
+        expandable={{
+            expandedRowRender,
+            defaultExpandedRowKeys: [],
+        }}
         size="middle"
         rowKey="created_at"
         />

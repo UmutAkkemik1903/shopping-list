@@ -26,20 +26,20 @@ export const DELETE_LIST_SUCCESS = 'DELETE_LIST_SUCCESS';
 export const DELETE_LIST_FAILURE = 'DELETE_LIST_FAILURE';
 
 export const fetchTableData = () => {
-    return async (dispatch) => {
-        dispatch({ type: FETCH_LISTS_REQUEST });
-        const token = localStorage.getItem('token');
-        try {
-            const response = await axios.get(`${baseUrl}list`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            dispatch({ type: FETCH_LISTS_SUCCESS, payload: response.data });
-        } catch (error) {
-            dispatch({ type: FETCH_LISTS_FAILURE, payload: error.message });
-        }
-    };
+  return async (dispatch) => {
+      dispatch({ type: FETCH_LISTS_REQUEST });
+      const token = localStorage.getItem('token');
+      try {
+          const response = await axios.get(`${baseUrl}list-products`, {
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+              },
+          });
+          dispatch({ type: FETCH_LISTS_SUCCESS, payload: response.data });
+      } catch (error) {
+          dispatch({ type: FETCH_LISTS_FAILURE, payload: error.message });
+      }
+  };
 };
 
 export const fetchArchiveData = () => {

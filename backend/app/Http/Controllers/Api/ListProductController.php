@@ -19,25 +19,28 @@ class ListProductController extends Controller
     {
         if (Auth::check()) {
             $user = Auth::user();
-            
-            $products = ListModel::where('created_by', $user->id)
-                ->join('list_product', function($join) {
+            $products = ListModel::leftJoin('list_product', function($join) {
                     $join->on('list_product.list_id', '=', 'shopping_list.id');
                 })
-                ->join('products', function($join) {
+                ->leftJoin('products', function($join) {
                     $join->on('list_product.product_id', '=', 'products.id');
                 })
+                ->where('shopping_list.deleted_at', null)
+                ->where('shopping_list.created_by', $user->id)
                 ->get([
                     'shopping_list.id as list_id',
                     'shopping_list.name as list_name',
                     'shopping_list.created_at as list_created_at',
                     'products.id as product_id',
                     'products.name as product_name',
-                    'products.created_at as product_created_at'
+                    'list_product.created_at as product_created_at',
+                    'list_product.quantity as quantity',
+                    'list_product.status as status',
                 ]);
         
             $groupedProducts = $products->groupBy('list_id')->map(function($items) {
                 return [
+                    'list_id' => $items->first()->list_id,
                     'list_name' => $items->first()->list_name,
                     'created_at' => $items->first()->list_created_at,
                     'products' => $items->map(function($item) {
@@ -45,6 +48,8 @@ class ListProductController extends Controller
                             'product_id' => $item->product_id,
                             'product_name' => $item->product_name,
                             'product_created_at' => $item->product_created_at,
+                            'quantity' => $item->quantity,
+                            'status' => $item->status,
                         ];
                     }),
                 ];
@@ -53,7 +58,7 @@ class ListProductController extends Controller
             return response()->json($groupedProducts);
         } else {
             return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);
-        }
+        } 
     }
 
     /**
@@ -64,28 +69,32 @@ class ListProductController extends Controller
         $user = Auth::user();
         if ($user) {
             $functionController = new FunctionController();
-    
+        
             $validator = Validator::make($request->all(), [
                 'list_id' => 'required|numeric',
-                'product_id' => 'required|numeric',
-                'quantity' => 'required|numeric',
+                'products' => 'required|array',
+                'products.*.product_id' => 'required|numeric',
+                'products.*.quantity' => 'required|numeric',
             ]);
-    
+        
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
             }
-    
-            ListProductModel::create([
-                'list_id' => $request->input('list_id'),
-                'product_id' => $request->input('product_id'),
-                'quantity' => $request->input('quantity'),
-                'created_at' => $functionController->nowDate,
-            ]);
-    
+        
+            foreach ($request->input('products') as $product) {
+                ListProductModel::create([
+                    'list_id' => $request->input('list_id'),
+                    'product_id' => $product['product_id'],
+                    'quantity' => $product['quantity'],
+                    'created_at' => $functionController->nowDate,
+                ]);
+            }
+        
             return response()->json(['success' => true, 'message' => 'Kayıt başarılı.']);
         } else {
             return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);
         }
+        
     }
 
     /**
