@@ -17,6 +17,7 @@ class ProductsController extends Controller
         if (Auth::check()){
             $user = Auth::user();
                 $products = ProductModel::where(['deleted_at'=>null])->get([
+                    'id as id',
                     'name as name',
                     'created_at as created_at',
                 ]);
