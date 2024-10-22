@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Form, Input, Typography, notification } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { loginUser } from '../../redux/actions/authActions';
+import '../../css/Login.css';
 
 const { Title } = Typography;
 
@@ -24,7 +25,7 @@ const LoginComponent = () => {
     };
 
     return (
-        <div>
+        <div className="login-container">
             {contextHolder}
             <Title>Giriş Yap</Title>
             <Form onFinish={handleSubmit}>
