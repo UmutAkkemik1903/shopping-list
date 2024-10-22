@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('list', [ListController::class, 'store']);
     Route::get('list', [ListController::class, 'index']);
+    Route::get('archive-list', [ListController::class, 'archivedList']);
     Route::get('list/{id}', [ListController::class, 'show']);
     Route::post('list-edit/{id}', [ListController::class, 'update']);
     Route::get('list-archive/{id}', [ListController::class, 'archive']);

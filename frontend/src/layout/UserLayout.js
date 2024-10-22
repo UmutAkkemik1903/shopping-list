@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import {Outlet} from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  HomeOutlined,
   OrderedListOutlined,
+  ShoppingCartOutlined,
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme } from 'antd';
 const { Header, Sider, Content, Footer } = Layout;
@@ -24,18 +25,13 @@ const App = () => {
           items={[
             {
               key: '1',
-              icon: <HomeOutlined />,
-              label: 'Anasayfa',
+              icon: <NavLink to="/"><ShoppingCartOutlined /></NavLink>,
+              label: 'Alışveriş Listem',
             },
             {
               key: '2',
-              icon: <OrderedListOutlined />,
+              icon: <NavLink to="/list"><OrderedListOutlined /></NavLink>,
               label: 'Liste Oluştur',
-            },
-            {
-              key: '3',
-              icon: <OrderedListOutlined />,
-              label: 'Alışveriş Listeleri',
             },
           ]}
         />
@@ -62,7 +58,7 @@ const App = () => {
           style={{
             margin: '24px 16px',
             padding: 24,
-            minHeight: 280,
+            minHeight: '100vh',
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
           }}

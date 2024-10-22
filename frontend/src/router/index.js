@@ -1,4 +1,5 @@
-import Dashboard from "../pages/dashboard";
+import ShoppingList from "../pages/shoppingList";
+import List from "../pages/list/tab";
 import UsersLayout from "../layout/UserLayout";
 import Login from "../pages/login/signIn";
 
@@ -12,7 +13,11 @@ const routes = [
         children:[
             {
                 index:true,
-                element:<Dashboard />
+                element:<ShoppingList />
+            },
+            {
+                path:"list",
+                element:<List />
             },
         ]
     },

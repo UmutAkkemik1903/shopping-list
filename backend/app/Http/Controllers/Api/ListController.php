@@ -34,6 +34,25 @@ class ListController extends Controller
         
     }
 
+    public function archivedList()
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            $products = ListModel::whereNotNull('deleted_at')->where('created_by', $user->id)
+                ->get([
+                    'id as list_id',
+                    'name as list_name',
+                    'created_at as list_created_at',
+                ]);
+        
+            return response()->json($products);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Kullanıcı girişi yapmalısınız.']);
+        }
+        
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -95,7 +114,7 @@ class ListController extends Controller
             $functionController = new FunctionController();
     
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
+                'list_name' => 'required|string|max:255',
             ]);
     
             if ($validator->fails()) {
@@ -103,7 +122,7 @@ class ListController extends Controller
             }
     
             ListModel::where(['id'=>$id])->update([
-                'name' => $request->input('name'),
+                'name' => $request->input('list_name'),
                 'updated_at' => $functionController->nowDate,
             ]);
     
